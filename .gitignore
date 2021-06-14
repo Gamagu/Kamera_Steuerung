@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Kamera_Steuerung.rc
+/Kamera_Steuerung.sln
+/test.h
+/Kamera_Steuerung.vcxproj.filters
+/Kamera_Steuerung.vcxproj
