@@ -14,6 +14,7 @@ public:
 	cv::Size resDetect; // res for mutiscale
 	// Resize Factors for x pixels and y pixels, if the frame got resized for computition
 	double resizeFactor[2];
+
 	camera(bool pcuda, SerialPort* parduino, int pdevice = 0) {
 		//overgive arduino objekt
 		arduino = parduino;
@@ -29,17 +30,18 @@ public:
 		iscuda = pcuda;
 		//device id
 		this->device = pdevice;
+
 		//Downscaled resolution for Face detection
-		
 		resDetect = cv::Size(960, 540);
 		std::cout << "Computingres  ";
 		std::cout << "width: " << resDetect.width << " height: " << resDetect.height << std::endl;
+
 		//Path of cascades
 		cascadePath = "C:/haarcascades/haarcascade_frontalface_alt.xml";
 		cascadePathCuda = "C:/opencv4.5.1/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_default.xml";
-		
 		loadCascade();
 
+		//Video device
 		int apiId = cv::CAP_ANY;
 		this->device = device;
 		
@@ -94,15 +96,15 @@ public:
 		if(mode == 0){
 			readImg(frameOut);
 		}
+
 		//Mode 1 Copies the last Frame to frameOut
 		if (mode == 1) {
-			//std::cout << "lastFrame: " << lastFrame.empty() << std::endl;
 			if(lastFrame.empty() == true){
 				throw std::exception("there is no last Frame");
 			}
 			lastFrame.copyTo(frameOut);
-
 		}
+
 		//Mode 2 retrieves new Frame, copies it to frameOut and lastFrame
 		if (mode == 2) {
 			readImg(frameOut);
@@ -124,7 +126,7 @@ public:
 
 	
 	void detectFaces(cv::Mat& input, std::vector<cv::Rect>& facesExt) {
-		//Detect faces from input and stores them into this->faces.
+		//Detect faces from input and stores them into facesExt.
 		try {
 			cascade.detectMultiScale(input, facesExt, 1.1, 3, 0, cv::Size(30, 30), cv::Size(300, 300));
 			
@@ -177,7 +179,6 @@ public:
 		//Convert the pixel to angles
 		ax = (1.0* viewAngle[0]/  resolution.width) * x;
 		ay = (-1.0 * viewAngle[1] / resolution.height) * y;
-		std::cout << "Angle: " << ax << std::endl;
 
 		// Move the Cam 
 		arduino->moveR((int)round(ax), (int)round(ay));
@@ -212,21 +213,27 @@ private:
 	std::mutex  camMutex;//For Cam
 	std::mutex proFrameMutex; //Mutex for Frame for Processing
 	std::mutex frameMutex;
+
 	//Mat for MUltithreading Processing
 	cv::Mat lastFrame;
 	cv::Mat proFrame;
 	cv::Mat proFrameGS;
+
 	//Local lates frame
 	cv::Mat frame;
 	cv::Mat frameGS; // Grayscale
 	
 	//resolution
 	cv::Size resolution;
+
 	//cascadeIdentifier setup
 	std::string cascadePath;
 	std::string cascadePathCuda;
 	cv::CascadeClassifier cascade ;
-	int bigFace;
+
+
+	int bigFace; // Index of the biggest face
+
 	//for moving camera
 	int viewAngle[2]; //viewing anlge x, y axis
 	//Camera
@@ -274,8 +281,6 @@ private:
 		//reads width and heigth of the cam
 		resolution = cv::Size((int) cam.get( cv::CAP_PROP_FRAME_WIDTH),(int) cam.get(cv::CAP_PROP_FRAME_HEIGHT));
 	}
-
-	
 
 };
 

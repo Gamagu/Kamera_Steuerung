@@ -7,8 +7,11 @@
 #include "SerialPort.h"
 #include <stdio.h>
 #include <thread>
+#include <string>
 
 SerialPort::SerialPort(const char* portName)
+// This class represents the Connection between my PC and the Arduino. It's used to exchange the Cordinates where the Arduino should move to.
+// 
 {
     x = 90;
     y = 90;
@@ -43,6 +46,7 @@ SerialPort::SerialPort(const char* portName)
         }
         else
         {
+            // Serial Configuration
             dcbSerialParameters.BaudRate = CBR_115200;
             dcbSerialParameters.ByteSize = 8;
             dcbSerialParameters.StopBits = ONESTOPBIT;
@@ -129,10 +133,8 @@ int SerialPort::readSerialPort(const char* buffer, unsigned int buf_size)
     }
 
     memset((void*)buffer, 0, buf_size);
-    std::cout << "to read:" << toRead << std::endl;
     if (ReadFile(this->handler, (void*)buffer, toRead, &bytesRead, NULL))
     {
-        std::cout << "read bytes:" <<bytesRead << std::endl;
         return bytesRead;
     }
 
@@ -180,6 +182,7 @@ bool SerialPort::writeData(int x, int y) {
     this->y = y;
     char buffer[MAX_DATA_LENGTH];
     char in[MAX_DATA_LENGTH] = "";
+
     //Creates Sting to send for arduino
     sprintf_s(buffer, "%d:%d\n", x, y);
     
@@ -206,9 +209,9 @@ int SerialPort::getValues(char* buffer) {
     if (iswritten == false) {
         throw IOException("Failed to write, while getValues!");
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(75));
+    std::this_thread::sleep_for(std::chrono::milliseconds(75)); // wait for the Arduino to move
+    // TODO: Calculate the time, which the arduino needs to move. Not just 75ms.
     result = this->readSerialPort(buffer, MAX_DATA_LENGTH);
-    std::cout << "Bytes read: " << result << std::endl;
     return result;
 }
 
@@ -235,6 +238,7 @@ void SerialPort::decodeData(char data[], int &x, int &y)
     idx[0] = helpString.find_first_of(':');
     idx[1] = helpString.find_first_of(':', idx[0]+1);
     idx[2] = helpString.find_first_of('\n');
+
     //x equals string from idx[0] to idx[1]-1 cuz there is the char 'y'.
     //same for y
     yeet = idx[1] - idx[0] - static_cast <unsigned __int64>(2);
@@ -248,12 +252,13 @@ void SerialPort::decodeData(char data[], int &x, int &y)
 bool SerialPort::getPort(std::string &buffer,int start, int end ) {
     //Just trys SerialPort::getData, if it returns sth and does not fail, it returns a working port as a String under Windows.
     
-    //Standartportpath for windows
+    //Standardportpath for windows
     char portBase[] = "\\\\.\\COM";
     
     std::string testString;
     char helpBuffer[255];
     SerialPort* test;
+
     for (int i = start; i < end; i++) {
 
         //helpbuffer : char <- portbase : str + i : int
@@ -307,12 +312,12 @@ void SerialPort::move(int x, int y) {
     this->writeData(x, y);
 }
 
-bool SerialPort::clear()
-{
-    PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
-    ClearCommError(this->handler, &this->errors, &this->status);
-    return false;
-}
+//bool SerialPort::clear()
+//{
+//    PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
+//    ClearCommError(this->handler, &this->errors, &this->status);
+//    return false;
+//}
 
 
 //Controctor for a Exception depending to the IO to arduino

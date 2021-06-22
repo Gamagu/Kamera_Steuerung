@@ -45,7 +45,8 @@ void output::showWebcam(bool move) {
 
 	try {
 		while (1) {
-			t1 = camera::time_since_epoch();// For fps calculation and limiter
+			// For fps calculation and limiter
+			t1 = camera::time_since_epoch();
 
 
 			showFrame(false); // output one frame
@@ -54,7 +55,8 @@ void output::showWebcam(bool move) {
 				break;
 			}
 
-			t2 = camera::time_since_epoch();// For fps calculation and limiter
+			// For fps calculation and limiter
+			t2 = camera::time_since_epoch();
 			deltaT = (t2 - t1);
 
 
@@ -104,7 +106,9 @@ void output::showFrame(bool debug) {
 	if (debug) {
 		std::cout << "image read" << std::endl;
 	}
+
 	frameIn.copyTo(frameOut);
+
 	if (this->isdetectFaces) {
 		//create grayscale
 		cv::cvtColor(frameIn, frameGS, cv::COLOR_RGB2GRAY);
@@ -127,11 +131,9 @@ void output::showFrame(bool debug) {
 			}
 		}
 		camera::drawFaces(faces, frameOut);
+
 		//Draw the bigFace
-	
 		idxBigFace = camera::getBiggesFace(faces);
-
-
 		//if a big face is found
 		if (idxBigFace != -1){
 			//store the cordinates(pixels) from the mid
@@ -140,12 +142,14 @@ void output::showFrame(bool debug) {
 			//Store the difference between the mid and middle of the face
 			distanceMidfaceToMid[0] = cam->getDistanceFacemidToMiddle_X(midFace.x);
 			distanceMidfaceToMid[1] = cam->getDistanceFacemidToMiddle_Y(midFace.y);
-			std::cout << "Distance middle tofacemid: " << distanceMidfaceToMid[0] << "|" << distanceMidfaceToMid[1] << std::endl;
+
+			if(debug){//Testing purposes
+				std::cout << "Distance middle tofacemid: " << distanceMidfaceToMid[0] << "|" << distanceMidfaceToMid[1] << std::endl;
+				cv::line(frameOut, midFace, cv::Point(cam->getWidth()/2,cam->getHeigth()/2 ), cv::Scalar(255, 0, 0), 2, 4, 0);
+			}
 			//draw the greatest face
 			cv::rectangle(frameOut, faces[idxBigFace], cv::Scalar(255, 0, 0), 2, 4, 0);
 			moveCam();
-			//Testing purposes
-			cv::line(frameOut, midFace, cv::Point(cam->getWidth()/2,cam->getHeigth()/2 ), cv::Scalar(255, 0, 0), 2, 4, 0);
 		}
 
 	}
@@ -178,8 +182,10 @@ void output::calculateDelay() {
 void output::outputFrame() {
 	try {
 		if (isShowFps) {
+			//draw FPS text
 			cv::putText(frameOut, std::to_string(fps), cv::Point(cam->getWidth() - 90, 100), 20, 1, cv::Scalar(0, 0, 255), 1);
 		}
+		//Output image
 		cv::imshow(name, frameOut);
 	}
 	catch (cv::Exception e) {
