@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /test.h
 /Kamera_Steuerung.vcxproj.filters
 /Kamera_Steuerung.vcxproj
+/resource.h
+/Errors.h
