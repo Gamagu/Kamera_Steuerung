@@ -1,3 +1,4 @@
+
 # Kamera_Steuerung
 ## Ziel des Projektes:
 In diesem Projekt will ich eine Kamera über Gesichtstracking meinem Gesicht folgen lassen. 
@@ -18,3 +19,5 @@ Ich habe dieses Projekt schon einmal in Python geschrieben, zusätzlich wollte i
   * Schicke Ui für Konfiguration der Optionen
   * Einen Output als Videostream freischalten -> kann in MS-Teams usw. verwendet werden.
 
+## 3D-Model:
+![Screenshot_kamerasteuerung](https://user-images.githubusercontent.com/60237453/124167197-106cf580-daa4-11eb-8f3f-63b9683d2cd0.PNG)
